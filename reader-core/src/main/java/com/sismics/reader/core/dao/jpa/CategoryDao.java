@@ -156,10 +156,21 @@ public class CategoryDao {
                 .setParameter("userId", userId);
         return q.getResultList();
     }
+    /**
+     * Returns the hierarchy of categories starting from a given category.
+     *
+     * @param parentId Parent Category ID
+     * @param userId User ID
+     * @return Root category with subcategories
+     */
+    public Category getCategoryHierarchy(String parentId, String userId) {
+        Category rootCategory = getCategory(parentId, userId);
+        return rootCategory;
+    }
 
     /**
      * Returns the list of sub-categories in a given category.
-     * 
+     *
      * @param parentId Parent category
      * @param userId User ID
      * @return List of categories
