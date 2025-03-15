@@ -100,9 +100,7 @@
         <div class="button feed refresh-button hidden"><img src="images/refresh.png" class="icon" />&nbsp;</div>
         <div class="button unread subscription category hidden all-button" data-i18n="toolbar.showall">Show all</div>
         <div class="button all unread subscription category hidden all-read-button" data-i18n="toolbar.allread">All read</div>
-        <!-- NEW Generate Report button -->
-        <div class="button feed hidden" id="generate-report-button">Generate Report</div>
-
+        
         <div class="button feed settings wizard about hidden settings-button"><img src="images/settings.png" class="icon" />&nbsp;</div>
         <div class="button feed hidden narrow-article"><img src="images/wide.png" class="icon hidden" /><img src="images/narrow.png" class="icon hidden" />&nbsp;</div>
         <div class="button feed hidden full-button"><img src="images/full.png" class="icon" />&nbsp;</div>
@@ -113,11 +111,7 @@
       
       <div id="feed-container" tabindex="1">
       </div>
-      <div id="report-container" style="padding: 10px; white-space: pre-wrap; display: none;">
-          <h2>Daily Report</h2>
-          <div id="reportResult"></div>
-      </div>
-
+      
       <div id="settings-container">
         <div id="settings-tabs">
           <ul>
@@ -365,31 +359,18 @@
         <ul>
         </ul>
       </div>
-
+      
       <div class="qtip-category-edit qtip-drop-menu">
-        <!-- Add Subcategory Form -->
-        <form class="add-subcategory-form">
-          <input type="button" value="Add Subcategory" class="show-pattern-button" data-show="+ .add-subcategory-section" />
-          <div class="showable add-subcategory-section">
-            <input type="text" class="sub-category-name-input" placeholder="Name" />
-            <input type="button" class="sub-category-add-submit-button important" value="OK" />
-          </div>
-        </form>
-
-        <!-- Edit Category Form -->
-        <form class="edit-category-form">
-          <input type="button" value="Edit" class="show-pattern-button" data-show="+ .edit-category-section" data-i18n="[value]category.edit.button" />
-          <div class="showable edit-category-section">
+        <form>
+          <input type="button" value="Edit" class="show-pattern-button" data-show="+ .showable" data-i18n="[value]category.edit.button" />
+          <div class="showable">
             <input type="text" class="category-edit-name-input" placeholder="Name" data-i18n="[placeholder]category.edit.placeholder" />
             <input type="submit" class="category-edit-submit-button important" value="OK" data-i18n="[value]category.edit.submit" />
           </div>
-        </form>
-
-        <!-- Delete Category Button -->
-        <form class="delete-category-form">
           <input type="button" class="category-edit-delete-button" value="Delete" data-i18n="[value]category.edit.delete" />
         </form>
       </div>
+      
       <div id="qtip-settings" class="qtip-drop-menu">
         <ul>
           <li><a href="#/settings/" data-i18n="toolbar.settings">Settings</a></li>

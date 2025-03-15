@@ -29,26 +29,6 @@ $(document).ready(function() {
   r.util.init();
   r.user.init();
   r.user.boot();
-
-  /**
-   * If you've added a "Generate Report" button in index.html with id="generate-report-button",
-   * attach a click handler here.
-   */
-  $("#generate-report-button").click(function() {
-    $.ajax({
-      url: "/reader-web/api/dailyReport", // Adjust if needed (e.g. "/api/dailyReport" or "/reader-web/api/dailyReport")
-      type: "GET",
-      success: function(data) {
-        // Show the container (assuming you hide it by default)
-        $("#report-container").show();
-        // Populate the report text
-        $("#reportResult").text(data);
-      },
-      error: function(err) {
-        alert("Error generating report:\n" + (err.responseText || err.statusText));
-      }
-    });
-  });
 });
 
 /**
@@ -67,7 +47,7 @@ r.main.initModules = function() {
   r.theme.init();
   r.shortcuts.init();
   
-  // First page logic
+  // First page
   if (r.user.hasBaseFunction('ADMIN') && r.user.userInfo.first_connection) {
     window.location.hash = '#/wizard/';
   } else if (window.location.hash.length == 0) {
