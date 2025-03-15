@@ -2,6 +2,8 @@
  * Initializing subscription module.
  */
 r.subscription.init = function() {
+
+
   // Actionbar: displaying subscriptions
   $('#subscriptions-show-button, #subscriptions .close-button, #subscriptions-backdrop').click(function() {
     $('#subscriptions').fadeToggle('fast');
@@ -14,7 +16,7 @@ r.subscription.init = function() {
     r.user.setDisplayUnread(unread);
     r.subscription.update();
   });
-  
+
   // Tip for adding subscription
   $('#subscription-add-button').qtip({
     content: { text: $('#qtip-subscription-add') },
@@ -32,21 +34,21 @@ r.subscription.init = function() {
       visible: function() { $('#subscription-url-input').focus(); }
     }
   });
-  
-  // Adding a subscription
+
+  //Adding a subscription
   $('#subscription-submit-button').click(function() {
     var _this = $(this);
     var url = $('#subscription-url-input').val();
-    
+
     // Validating form
     if (url != '') {
       // Disable button during the request to avoid double entries
       _this.attr('disabled', 'disabled');
       $('#subscriptions .ajax-loader').removeClass('hidden');
-      
+
       // Closing tip
       $('#subscription-add-button').qtip('hide');
-      
+
       // Calling API
       r.util.ajax({
         url: r.util.url.subscription_add,
@@ -54,8 +56,9 @@ r.subscription.init = function() {
         data: { url: url },
         done: function(data) {
           // Reseting form
+          console.log("Categories Data:", data.categories);
           $('#qtip-subscription-add form')[0].reset();
-          
+
           // Open newly added feed
           window.location.hash = '#/feed/subscription/' + data.id;
         },
@@ -70,14 +73,16 @@ r.subscription.init = function() {
         }
       });
     }
-    
+
     // Prevent form submission
     return false;
   });
-  
+
+
+
   // Initializing toolbar subscriptions actions
   r.subscription.initToolbar();
-  
+
   // Refresh subscription tree every minutes
   setInterval(function() {
     // Check if no category or subscription edit qtip is opened
@@ -85,13 +90,13 @@ r.subscription.init = function() {
       r.subscription.update();
     }
   }, 60000);
-  
+
   $('#subscriptions').on('click', 'li a', function() {
     // Force hashchange trigger if the user clicks on an already opened feed
     if (window.location.hash == $(this).attr('href')) {
       $.History.trigger();
     }
-    
+
     // Hide subscriptions on mobile
     if(r.main.mobile) {
       $('#subscriptions').fadeOut('fast');
@@ -103,63 +108,61 @@ r.subscription.init = function() {
 /**
  * Updating subscriptions tree.
  */
+
+
 r.subscription.update = function() {
-  // Unread state
   var unread = r.user.isDisplayUnread();
-  
-  // Getting subscriptions
+
   r.util.ajax({
     url: r.util.url.subscription_list,
     data: { unread: unread },
     type: 'GET',
     done: function(data) {
-      if ($(data.categories[0].categories).size() > 0 || $(data.categories[0].subscriptions).size() > 0) {
-        // Building HTML tree
-        var html = '<ul id="category-root" data-category-id="' + data.categories[0].id + '">';
-        $(data.categories[0].categories).each(function(i, category) {
-          // Adding sub-category
-          var subscriptionsHtml = '<ul ' + (category.folded ? 'style="display: none;"' : '') + '>';
-          if ($(category.subscriptions).length > 0) {
-            // Adding subscriptions
-            $(category.subscriptions).each(function(i, subscription) {
+      if (!data.categories || data.categories.length === 0) {
+        $('#subscription-list').html('<p>' + $.t('subscription.empty') + '</p>');
+        return;
+      }
+
+      function buildCategoryTree(categories) {
+        if (!categories || categories.length === 0) return '';
+
+
+
+        var html = '<ul>';
+        categories.forEach(function(category) {
+          var subCategoriesHtml = buildCategoryTree(category.categories); // Recursively process subcategories
+          var subscriptionsHtml = '';
+
+          if (category.subscriptions && category.subscriptions.length > 0) {
+            category.subscriptions.forEach(function(subscription) {
               subscriptionsHtml += r.subscription.buildSubscriptionItem(subscription);
             });
           }
-          subscriptionsHtml += '</ul>';
-          html += r.subscription.buildCategoryItem(category, subscriptionsHtml);
+
+          // Ensure categories include both subcategories and subscriptions
+          html += r.subscription.buildCategoryItem(category, subCategoriesHtml + subscriptionsHtml);
         });
-        
-        // Adding remaining subscriptions
-        $(data.categories[0].subscriptions).each(function(i, subscription) {
+        html += '</ul>';
+        return html;
+      }
+
+
+
+      var html = '<ul id="category-root" data-category-id="' + data.categories[0].id + '">';
+      html += buildCategoryTree(data.categories[0].categories);
+
+      // Add root-level subscriptions
+      if (data.categories[0].subscriptions && data.categories[0].subscriptions.length > 0) {
+        data.categories[0].subscriptions.forEach(function(subscription) {
           html += r.subscription.buildSubscriptionItem(subscription);
         });
-        html += '&nbsp;</ul>';
-        
-        // Updating HTML and force redraw
-        $('#subscription-list')
-          .html(html)
-          .redraw();
-      } else {
-        // Empty placeholder
-        var html = '<p>' + $.t('subscription.empty') + '</p>';
-        if (unread) {
-          html = '<p>' + $.t('subscription.emptyunread') + '</p>'
-            + '<p><a href="#">' + $.t('subscription.showall') + '</a></p>';
-        }
-        $('#subscription-list').html(html);
-        $('#subscription-list p a').click(function() {
-          r.user.setDisplayUnread(false);
-          r.subscription.update();
-        });
       }
-      
-      // Updating main unread item and title
-      var unreadItem = $('#unread-feed-button');
-      r.subscription.updateUnreadCount(unreadItem, data.unread_count);
-      r.subscription.updateTitle(data.unread_count);
-      
-      // Initializing tree features
-      r.subscription.initSorting(data.categories[0].id);
+
+      html += '</ul>';
+
+      $('#subscription-list').html(html).redraw(); // Refresh the UI
+
+      // Initialize UI features
       r.subscription.initCollapsing();
       r.subscription.initEditing();
     }
@@ -171,32 +174,68 @@ r.subscription.update = function() {
  */
 r.subscription.buildSubscriptionItem = function(subscription) {
   var unread = '<span class="unread-count" ' + (subscription.unread_count == 0 ? 'style="display: none;"' : '') + '>&nbsp;(<span class="count">' + subscription.unread_count + '</span>)</span>';
-  
+
   var title = r.util.escape(subscription.title);
   return '<li id="subscription-' + subscription.id + '" data-subscription-id="' + subscription.id + '" data-subscription-url="' + subscription.url + '" ' +
-    'class="subscription' + (r.feed.context.subscriptionId == subscription.id ? ' active' : '') + (subscription.unread_count > 0 ? ' unread' : '') + '">' +
-    '<a href="#/feed/subscription/' + subscription.id + '" title="' + title + '"> <img src="' + r.util.url.subscription_favicon.replace('{id}', subscription.id) + '" /> ' +
-    (subscription.sync_fail_count >= 5 ? '<img src="images/warning.png" title="' + $.t('subscription.syncfail') + '" />' : '') +
-    '<span class="title">' + title + '</span>' + unread + '</a>' +
-    '<div class="edit"></div>' +
-    '</li>';
+      'class="subscription' + (r.feed.context.subscriptionId == subscription.id ? ' active' : '') + (subscription.unread_count > 0 ? ' unread' : '') + '">' +
+      '<a href="#/feed/subscription/' + subscription.id + '" title="' + title + '"> <img src="' + r.util.url.subscription_favicon.replace('{id}', subscription.id) + '" /> ' +
+      (subscription.sync_fail_count >= 5 ? '<img src="images/warning.png" title="' + $.t('subscription.syncfail') + '" />' : '') +
+      '<span class="title">' + title + '</span>' + unread + '</a>' +
+      '<div class="edit"></div>' +
+      '</li>';
 };
 
 /**
  * Building category li.
  */
-r.subscription.buildCategoryItem = function(category, subscriptionsHtml) {
-  var unread = '<span class="unread-count" ' + (category.unread_count == 0 ? 'style="display: none;"' : '') + '>&nbsp;(<span class="count">' + category.unread_count + '</span>)</span>';
-  
+r.subscription.buildCategoryItem = function(category, nestedHtml) {
+  // Calculate total unread count by summing:
+  // 1. Unread counts of all subscriptions in this category
+  // 2. Unread counts of all subcategories
+  var totalUnreadCount = category.unread_count || 0; // Initialize with existing unread count
+
+  // Sum unread counts from direct subscriptions
+  if (category.subscriptions && category.subscriptions.length > 0) {
+    category.subscriptions.forEach(function(subscription) {
+      totalUnreadCount += subscription.unread_count || 0;
+    });
+  }
+
+  // Sum unread counts from subcategories (recursive aggregation)
+  if (category.categories && category.categories.length > 0) {
+    category.categories.forEach(function(subCategory) {
+      totalUnreadCount += subCategory.unread_count || 0;
+    });
+  }
+
+  // Ensure the computed unread count is used
+  category.unread_count = totalUnreadCount;
+
+  var unread = '<span class="unread-count" ' +
+      (totalUnreadCount == 0 ? 'style="display: none;"' : '') +
+      '>&nbsp;(<span class="count">' + totalUnreadCount + '</span>)</span>';
+
   var name = r.util.escape(category.name);
-  return '<li id="category-' + category.id + '" data-category-id="' + category.id + '" ' +
-    'class="category' + (r.feed.context.categoryId == category.id ? ' active' : '') + (category.unread_count > 0 ? ' unread' : '') + '">' +
-    '<div class="collapse ' + (category.folded ? 'closed' : 'opened') + '"></div>' +
-    '<a href="#/feed/category/' + category.id + '" title="' + name + '"> <img src="images/category.png" /> ' +
-    '<span class="name">' + name + '</span>' + unread + '</a>' +
-    '<div class="edit"></div>' + 
-    subscriptionsHtml +
-    '</li>';
+
+  return '<li id="category-' + category.id + '" data-category-id="' + category.id + '" class="category' +
+      (r.feed.context.categoryId == category.id ? ' active' : '') +
+      (totalUnreadCount > 0 ? ' unread' : '') + '">' +
+
+      // Category toggle (expand/collapse)
+      '<div class="collapse ' + (category.folded ? 'closed' : 'opened') + '" onclick="toggleCategory(\'' + category.id + '\')"></div>' +
+
+      // Category link
+      '<a href="#/feed/category/' + category.id + '" title="' + name + '"> ' +
+      '<img src="images/category.png" /> ' +
+      '<span class="name">' + name + '</span>' + unread + '</a>' +
+
+      '<div class="edit"></div>' +
+
+      // Subcategories and Subscriptions container
+      '<ul id="category-' + category.id + '-children" ' + (category.folded ? 'style="display: none;"' : '') + '>' +
+      nestedHtml + // ✅ Ensures BOTH subcategories and subscriptions are included
+      '</ul>' +
+      '</li>';
 };
 
 /**
@@ -238,11 +277,11 @@ r.subscription.initSorting = function(rootCategoryId) {
           $().toastmessage('showErrorToast', $.t('category.nonesting'));
           return;
         }
-        
+
         // Getting contextual parameters
         var categoryId = ui.item.attr('data-category-id');
         var order = ui.item.index();
-        
+
         // Calling API
         r.util.ajax({
           url: r.util.url.category_update.replace('{id}', categoryId),
@@ -258,6 +297,7 @@ r.subscription.initSorting = function(rootCategoryId) {
   }).disableSelection();
 };
 
+
 /**
  * Initializing collapsing feature.
  */
@@ -268,7 +308,7 @@ r.subscription.initCollapsing = function() {
     var categoryId = parent.attr('data-category-id');
     children.toggle();
     $(this).toggleClass('opened').toggleClass('closed');
-    
+
     // Calling API
     r.util.ajax({
       url: r.util.url.category_update.replace('{id}', categoryId),
@@ -296,7 +336,7 @@ r.subscription.initEditing = function() {
     var infoContent = $('#template .qtip-subscription-edit-info').clone();
     var titleInput = content.find('.subscription-edit-title-input');
     titleInput.val(parent.find('> a .title').text().trim());
-    
+
     // Calling API delete
     $('.subscription-edit-delete-button', content).click(function() {
       if (confirm($.t('subscription.edit.deleteconfirm'))) {
@@ -312,11 +352,11 @@ r.subscription.initEditing = function() {
         });
       }
     });
-    
+
     // Calling API edit
     $('.subscription-edit-submit-button', content).click(function() {
       var title = titleInput.val();
-      
+
       if (title != '') {
         r.util.ajax({
           url: r.util.url.subscription_update.replace('{id}', subscriptionId),
@@ -378,7 +418,7 @@ r.subscription.initEditing = function() {
         }
       });
     });
-    
+
     // Creating edit popup
     $(this).qtip({
       content: { text: content },
@@ -413,7 +453,7 @@ r.subscription.initEditing = function() {
       style: { classes: 'qtip-light qtip-shadow' }
     });
   });
-  
+
   // Categories editing
   $('#subscription-list li.category > .edit').each(function() {
     // Initializing edit popup
@@ -421,10 +461,13 @@ r.subscription.initEditing = function() {
     var categoryId = parent.attr('data-category-id');
     var content = $('#template .qtip-category-edit').clone();
     var nameInput = content.find('.category-edit-name-input');
+    var subCatName = content.find('.sub-category-name-input')
     nameInput.val(parent.find('> a .name').text().trim());
-    
+    subCatName.val(parent.find('> a .name').text().trim());
+
     // Calling API delete
     $('.category-edit-delete-button', content).click(function() {
+      console.log("delete button testing");
       if (confirm($.t('category.edit.deleteconfirm'))) {
         r.util.ajax({
           url: r.util.url.category_delete.replace('{id}', categoryId),
@@ -438,11 +481,43 @@ r.subscription.initEditing = function() {
         });
       }
     });
-    
+
+
+    $('.sub-category-add-submit-button', content).click(function() {
+      var name = subCatName.val();
+      var _this = $(this);
+      console.log("subcategory button testing");
+      console.log(name)
+      console.log(categoryId)
+      console.log(parent)
+      if(name!=''){
+        r.util.ajax({
+          url: r.util.url.category_add,
+          type: 'PUT',
+          data: { name: name, parentId : categoryId },
+          done: function(data) {
+            // Closing tip
+            $('#category-add-button').qtip('hide');
+
+            // Reseting form
+            $('#qtip-category-add form')[0].reset();
+
+            // Updating subscriptions tree
+            r.subscription.update();
+          },
+          always: function() {
+            // Enabing button
+            _this.removeAttr('disabled');
+          }
+        });
+      }
+
+    });
+
     // Calling API edit
     $('.category-edit-submit-button', content).click(function() {
       var name = nameInput.val();
-      
+      console.log("edit button testing");
       if (name != '') {
         r.util.ajax({
           url: r.util.url.category_update.replace('{id}', categoryId),
@@ -454,11 +529,11 @@ r.subscription.initEditing = function() {
           }
         });
       }
-      
+
       // Prevent form submission
       return false;
     });
-    
+
     // Creating edit popup
     $(this).qtip({
       content: { text: content },
@@ -484,7 +559,7 @@ r.subscription.initToolbar = function() {
   content.on('click', 'li', function() {
     var categoryId = $(this).attr('data-category-id');
     var subscriptionId = r.feed.context.subscriptionId;
-    
+
     // Calling API
     r.util.ajax({
       url: r.util.url.subscription_update.replace('{id}', subscriptionId),
@@ -496,7 +571,7 @@ r.subscription.initToolbar = function() {
       }
     });
   });
-  
+
   // Configuring change category tooltip
   $('#toolbar .category-button').qtip({
     content: { text: content },
@@ -514,9 +589,9 @@ r.subscription.initToolbar = function() {
         // Current subscription category
         var subscriptionId = r.feed.context.subscriptionId;
         var categoryId = $('#subscription-list .subscription[data-subscription-id="' + subscriptionId + '"]')
-          .closest('*[data-category-id]')
-          .attr('data-category-id');
-        
+            .closest('*[data-category-id]')
+            .attr('data-category-id');
+
         // Loading categories on qtip opening
         content.html('<img src="images/loader.gif" />');
         r.util.ajax({
@@ -527,7 +602,7 @@ r.subscription.initToolbar = function() {
             html = '<ul><li data-category-id="' + data.categories[0].id + '">' + $.t('category.empty') + '</li>';
             $(categories).each(function(i, category) {
               html += '<li data-category-id="' + category.id + '">'
-                + r.util.escape(category.name) + '</li>';
+                  + r.util.escape(category.name) + '</li>';
             });
             html += '</ul>';
             content.html(html);
@@ -552,17 +627,17 @@ r.subscription.updateUnreadCount = function(item, count) {
   } else if (count == -2) {
     count = current + 1;
   }
-  
+
   if (count > 0) {
     item.addClass('unread')
-      .find('> a .unread-count')
-      .show();
+        .find('> a .unread-count')
+        .show();
   } else {
     item.removeClass('unread')
-      .find('> a .unread-count')
-      .hide();
+        .find('> a .unread-count')
+        .hide();
   }
-  
+
   countItem.html(count);
   return count;
 };

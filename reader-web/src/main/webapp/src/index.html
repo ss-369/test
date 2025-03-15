@@ -359,18 +359,31 @@
         <ul>
         </ul>
       </div>
-      
+
       <div class="qtip-category-edit qtip-drop-menu">
-        <form>
-          <input type="button" value="Edit" class="show-pattern-button" data-show="+ .showable" data-i18n="[value]category.edit.button" />
-          <div class="showable">
+        <!-- Add Subcategory Form -->
+        <form class="add-subcategory-form">
+          <input type="button" value="Add Subcategory" class="show-pattern-button" data-show="+ .add-subcategory-section" />
+          <div class="showable add-subcategory-section">
+            <input type="text" class="sub-category-name-input" placeholder="Name" />
+            <input type="button" class="sub-category-add-submit-button important" value="OK" />
+          </div>
+        </form>
+
+        <!-- Edit Category Form -->
+        <form class="edit-category-form">
+          <input type="button" value="Edit" class="show-pattern-button" data-show="+ .edit-category-section" data-i18n="[value]category.edit.button" />
+          <div class="showable edit-category-section">
             <input type="text" class="category-edit-name-input" placeholder="Name" data-i18n="[placeholder]category.edit.placeholder" />
             <input type="submit" class="category-edit-submit-button important" value="OK" data-i18n="[value]category.edit.submit" />
           </div>
+        </form>
+
+        <!-- Delete Category Button -->
+        <form class="delete-category-form">
           <input type="button" class="category-edit-delete-button" value="Delete" data-i18n="[value]category.edit.delete" />
         </form>
       </div>
-      
       <div id="qtip-settings" class="qtip-drop-menu">
         <ul>
           <li><a href="#/settings/" data-i18n="toolbar.settings">Settings</a></li>
