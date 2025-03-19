@@ -6,44 +6,44 @@ import java.util.List;
 /**
  * User article subscriptions criteria.
  *
- * @author jtremeaux 
+ * @author jtremeaux
  */
 public class UserArticleCriteria {
     /**
      * User ID.
      */
     private String userId;
-    
+
     /**
      * Feed ID.
      */
     private String feedId;
-    
+
     /**
      * The article is visible to the user (he has a UserArticle).
      */
     private boolean visible;
-    
+
     /**
      * Returns the article only if the user is subscribed to the feed.
      */
     private boolean subscribed;
-    
+
     /**
      * Feed subscription ID.
      */
     private String feedSubscriptionId;
-    
+
     /**
      * Category ID.
      */
     private String categoryId;
-    
+
     /**
      * Returns only unread articles.
      */
     private boolean unread;
-    
+
     /**
      * Returns only starred articles.
      */
@@ -88,6 +88,11 @@ public class UserArticleCriteria {
      * Fetch all subscriptions (returns subscriptions * articles rows)
      */
     private boolean fetchAllFeedSubscription;
+
+    /**
+     * Minimum date filter.
+     */
+    private Date dateMin;
 
     /**
      * Getter of userId.
@@ -380,6 +385,25 @@ public class UserArticleCriteria {
 
     public UserArticleCriteria setFetchAllFeedSubscription(boolean fetchAllFeedSubscription) {
         this.fetchAllFeedSubscription = fetchAllFeedSubscription;
+        return this;
+    }
+
+    /**
+     * Getter of dateMin.
+     *
+     * @return dateMin
+     */
+    public Date getDateMin() {
+        return dateMin;
+    }
+
+    /**
+     * Setter of dateMin.
+     *
+     * @param dateMin dateMin
+     */
+    public UserArticleCriteria setDateMin(Date dateMin) {
+        this.dateMin = dateMin;
         return this;
     }
 }

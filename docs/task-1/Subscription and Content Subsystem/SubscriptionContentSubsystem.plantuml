@@ -1,0 +1,89 @@
+@startuml
+!theme plain
+top to bottom direction
+
+
+
+class SubscriptionResource {
+  + update(String, String, String, Integer): Response
+  + importFile(FormDataBodyPart): Response
+  + getSynchronization(String): Response
+  + get(String, boolean, Integer, String): Response
+  + add(String, String): Response
+  + favicon(String): Response
+  + export(): Response
+  + read(String): Response
+  + list(boolean): Response
+  + delete(String): Response
+}
+
+class ContentResource {
+  + getRecentArticles(Integer): Response
+  + fetchFeed(String): Response
+}
+
+class FeedParser {
+  + parseFeed(String): List<Article>
+  + supportsFormat(String): boolean
+}
+
+class ExportManager {
+  + exportToXML(): String
+}
+
+class ImportManager {
+  + importFromGoogleTakeout(File): Response
+  + importFromOPML(File): Response
+}
+
+class Article {
+  - title: String
+  - content: String
+  - link: String
+  - publicationDate: Date
+}
+
+class Subscription {
+  - id: Integer
+  - url: String
+  - title: String
+  - lastUpdated: Date
+}
+
+class ArticleResource {
+  + unreadMultiple(List<String>): Response
+  + unread(String): Response
+  + read(String): Response
+  + readMultiple(List<String>): Response
+}
+
+class UserResource {
+  + list(Integer, Integer, Integer, Boolean): Response
+}
+
+class CategoryResource {
+  + add(String): Response
+  + get(String, boolean, Integer, String): Response
+  + update(String, String, Integer, Boolean): Response
+  + list(): Response
+  + delete(String): Response
+  + read(String): Response
+}
+
+SubscriptionResource --> Subscription
+SubscriptionResource --> ContentResource : fetch recent articles (10)
+SubscriptionResource --> ExportManager : export to XML
+SubscriptionResource --> ImportManager : import OPML/ZIP
+
+ContentResource --> FeedParser : parse feeds
+ContentResource --> Article : fetch articles
+FeedParser --> Article
+
+ImportManager --> Subscription
+ExportManager --> Subscription
+
+ArticleResource --> Article : read article
+UserResource --> Subscription
+CategoryResource --> Subscription
+
+@enduml

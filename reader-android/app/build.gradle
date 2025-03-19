@@ -1,0 +1,52 @@
+buildscript {
+    repositories {
+        jcenter()
+        google()
+    }
+    dependencies {
+        classpath 'com.android.tools.build:gradle:3.3.0'
+    }
+}
+
+apply plugin: 'com.android.application'
+
+repositories {
+    mavenCentral()
+    google()
+    flatDir { dirs 'libs' }
+}
+
+android {
+    compileSdkVersion 28
+    useLibrary 'org.apache.http.legacy'
+
+    defaultConfig {
+        minSdkVersion 14
+        targetSdkVersion 28
+        versionCode 12
+        versionName "1.6.0"
+    }
+
+    signingConfigs {
+        release {
+            storeFile file(String.valueOf(System.getenv("READER_STORE_PATH")))
+            storePassword String.valueOf(System.getenv("READER_STORE_PASS"))
+            keyAlias String.valueOf(System.getenv("READER_STORE_ALIAS"))
+            keyPassword String.valueOf(System.getenv("READER_STORE_KEYPASS"))
+        }
+    }
+
+    buildTypes {
+        release {
+            signingConfig signingConfigs.release
+        }
+    }
+}
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: '*.jar')
+    implementation 'com.android.support:support-v4:28.0.0'
+    implementation 'com.android.support:appcompat-v7:28.0.0'
+    implementation 'com.mobeta.android.dslv:drag-sort-listview:0.6.1-SNAPSHOT-AAR@aar'
+    implementation 'com.loopj.android:android-async-http:1.4.4'
+}

@@ -1,0 +1,14 @@
+/* ...existing code... */
+
+/* Report styles */
+.report-content {
+    padding: 15px;
+    line-height: 1.5;
+    font-size: 14px;
+}
+
+.report-icon {
+    background-image: url('../images/icons/report.png') !important;
+}
+
+/* ...existing code... */

@@ -1,0 +1,67 @@
+// ...existing code...
+
+/* Report styling */
+.report-content {
+    line-height: 1.5;
+    font-size: 14px;
+    max-height: 80vh;
+    overflow-y: auto;
+    padding: 10px;
+}
+
+.report-content h1 {
+    font-size: 22px;
+    margin: 15px 0 10px 0;
+    color: #333;
+}
+
+.report-content h2 {
+    font-size: 18px;
+    margin: 12px 0 8px 0;
+    color: #444;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 5px;
+}
+
+.report-content h3 {
+    font-size: 16px;
+    margin: 10px 0 5px 0;
+    color: #555;
+}
+
+.report-content ul,
+.report-content ol {
+    margin-left: 20px;
+    margin-bottom: 15px;
+}
+
+.report-content li {
+    margin-bottom: 5px;
+}
+
+.report-content p {
+    margin-bottom: 12px;
+}
+
+.spinner {
+    display: none;
+    width: 40px;
+    height: 40px;
+    margin: 50px auto;
+    border: 4px solid #f3f3f3;
+    border-top: 4px solid #3498db;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+// ...existing code...

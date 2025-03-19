@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+  <parent>
+    <groupId>com.sismics.reader</groupId>
+    <artifactId>reader-parent</artifactId>
+    <version>1.6-SNAPSHOT</version>
+    <relativePath>..</relativePath>
+  </parent>
+  
+  <modelVersion>4.0.0</modelVersion>
+  <artifactId>reader-distribution-debian</artifactId>
+  <packaging>jar</packaging>
+  <name>Reader Debian Distribution</name>
+
+  <properties>
+    <timestamp>${maven.build.timestamp}</timestamp>
+    <maven.build.timestamp.format>EEE, d MMM yyyy HH:mm:ss Z</maven.build.timestamp.format>
+  </properties>
+  
+  <build>
+    <resources>
+      <resource>
+        <directory>src/main/deb</directory>
+        <filtering>true</filtering>
+      </resource>
+      <resource>
+        <directory>src/main/package</directory>
+        <filtering>true</filtering>
+      </resource>
+    </resources>
+
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>unpack</id>
+            <phase>package</phase>
+            <goals>
+              <goal>unpack</goal>
+            </goals>
+            <configuration>
+              <artifactItems>
+                <artifactItem>
+                  <groupId>com.sismics.reader</groupId>
+                  <artifactId>reader-distribution-standalone</artifactId>
+                  <version>${project.version}</version>
+                  <type>tar.gz</type>
+                  <classifier>dist</classifier>
+                  <overWrite>false</overWrite>
+                  <outputDirectory>${project.build.directory}</outputDirectory>
+                </artifactItem>
+              </artifactItems>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+
+      <plugin>
+        <groupId>org.vafer</groupId>
+        <artifactId>jdeb</artifactId>
+        <executions>
+          <execution>
+            <phase>package</phase>
+            <goals>
+              <goal>jdeb</goal>
+            </goals>
+            <configuration>
+              <verbose>true</verbose>
+              <controlDir>${project.build.outputDirectory}/control</controlDir>
+              <deb>${project.build.directory}/reader-${project.version}.deb</deb>
+              <dataSet>
+                <data>
+                  <type>template</type>
+                  <paths>
+                    <path>usr/share/reader</path>
+                    <path>usr/share/doc/reader</path>
+                  </paths>
+                  <mapper>
+                    <type>perm</type>
+                    <user>root</user>
+                    <group>root</group>
+                  </mapper>
+                </data>
+                
+                <data>
+                  <src>${project.build.outputDirectory}/etc/init.d/reader</src>
+                  <type>file</type>
+                  <mapper>
+                    <type>perm</type>
+                    <prefix>/etc/init.d</prefix>
+                    <user>root</user>
+                    <group>root</group>
+                    <filemode>755</filemode>
+                  </mapper>
+                </data>
+      
+                <data>
+                  <src>${project.build.outputDirectory}/etc/default/reader</src>
+                  <type>file</type>
+                  <mapper>
+                    <type>perm</type>
+                    <prefix>/etc/default</prefix>
+                    <user>root</user>
+                    <group>root</group>
+                  </mapper>
+                </data>
+      
+                <data>
+                  <src>${project.build.outputDirectory}/usr/share/doc/reader</src>
+                  <type>directory</type>
+                  <mapper>
+                    <type>perm</type>
+                    <prefix>/usr/share/doc/reader</prefix>
+                    <user>root</user>
+                    <group>root</group>
+                  </mapper>
+                </data>
+
+                <data>
+                  <src>${project.build.directory}/reader-distribution-standalone-${project.version}</src>
+                  <type>directory</type>
+                  <excludes>reader.sh</excludes>
+                  <mapper>
+                    <type>perm</type>
+                    <prefix>/usr/share/reader</prefix>
+                    <user>root</user>
+                    <group>root</group>
+                  </mapper>
+                </data>
+      
+                <data>
+                  <src>${project.build.directory}/reader-distribution-standalone-${project.version}/reader.sh</src>
+                  <type>file</type>
+                  <mapper>
+                    <type>perm</type>
+                    <prefix>/usr/share/reader</prefix>
+                    <user>root</user>
+                    <group>root</group>
+                    <filemode>755</filemode>
+                  </mapper>
+                </data>
+              </dataSet>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+</project>

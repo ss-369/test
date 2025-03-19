@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    <PreferenceCategory
+        android:key="pref_general_category"
+        android:title="@string/pref_general_category">
+
+        <ListPreference
+            android:key="pref_fontSize"
+            android:title="@string/pref_font_size"
+            android:dialogTitle="@string/pref_font_size"
+            android:entries="@array/fontSize"
+            android:entryValues="@array/fontSizeValues"
+            android:defaultValue="12"/>
+
+        <CheckBoxPreference
+            android:key="pref_subscriptionsUnread"
+            android:title="@string/pref_subscriptions_unread"
+            android:summaryOn="@string/pref_subscriptions_unread_enabled"
+            android:summaryOff="@string/pref_subscriptions_unread_disabled"
+            android:defaultValue="false"/>
+
+        <ListPreference
+            android:key="pref_defaultSubscription"
+            android:title="@string/pref_default_subscription"
+            android:dialogTitle="@string/pref_default_subscription"
+            android:entries="@array/defaultSubscriptions"
+            android:entryValues="@array/defaultSubscriptionsValues"
+            android:defaultValue="1"/>
+
+        <ListPreference
+            android:key="pref_articlesFetched"
+            android:title="@string/pref_articles_fetched"
+            android:dialogTitle="@string/pref_articles_fetched"
+            android:entries="@array/articlesFetched"
+            android:entryValues="@array/articlesFetched"
+            android:defaultValue="10"/>
+
+        <Preference
+            android:key="pref_clearHistory"
+            android:title="@string/pref_clear_history_title"
+            android:summary="@string/pref_clear_history_summary">
+        </Preference>
+
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        android:key="pref_reporting_category"
+        android:title="@string/pref_reporting_category">
+
+        <CheckBoxPreference
+            android:key="acra.enable"
+            android:title="@string/pref_enable_acra"
+            android:summaryOn="@string/pref_acra_enabled"
+            android:summaryOff="@string/pref_acra_disabled"
+            android:defaultValue="true"/>
+        
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        android:key="pref_about_category"
+        android:title="@string/pref_about_category">
+
+        <Preference
+            android:key="pref_website"
+            android:title="@string/pref_website"
+            android:summary="www.sismics.com/reader">
+            <intent
+                android:action="android.intent.action.VIEW"
+                android:data="http://www.sismics.com/reader"/>
+        </Preference>
+
+        <Preference
+            android:key="pref_github"
+            android:title="@string/pref_github"
+            android:summary="github.com/sismics/reader">
+            <intent
+                android:action="android.intent.action.VIEW"
+                android:data="https://github.com/sismics/reader"/>
+        </Preference>
+
+        <Preference
+            android:key="pref_issue"
+            android:title="@string/pref_issue"
+            android:summary="github.com/sismics/reader/issues">
+            <intent
+                android:action="android.intent.action.VIEW"
+                android:data="https://github.com/sismics/reader/issues"/>
+        </Preference>
+
+        <Preference
+            android:key="pref_license"
+            android:title="@string/pref_license_title"
+            android:summary="@string/pref_license_summary">
+            <intent android:action="com.sismics.reader.LICENSES"/>
+        </Preference>
+
+        <Preference
+            android:key="pref_version"
+            android:title="@string/application_name"/>
+
+    </PreferenceCategory>
+
+</PreferenceScreen>

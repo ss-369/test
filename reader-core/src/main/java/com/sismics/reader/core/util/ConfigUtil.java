@@ -46,7 +46,7 @@ public class ConfigUtil {
      */
     public static int getConfigIntegerValue(ConfigType configType) {
         String value = getConfigStringValue(configType);
-        
+
         return Integer.parseInt(value);
     }
 
@@ -59,7 +59,34 @@ public class ConfigUtil {
      */
     public static boolean getConfigBooleanValue(ConfigType configType) {
         String value = getConfigStringValue(configType);
-        
+
         return Boolean.parseBoolean(value);
+    }
+
+    /**
+     * Gemini API key.
+     */
+    public static final String CONFIG_GEMINI_API_KEY = "AIzaSyB73xDzzrinj1-5I-geuD5oQSngfWuIr1o";
+
+    /**
+     * Returns the string value of a configuration parameter from the properties
+     * file.
+     * 
+     * @param key The key of the configuration parameter
+     * @return String value of the configuration parameter
+     */
+    public static String getConfigStringValue(String key) {
+        // For simple string constants, just return directly since we're not using
+        // ConfigType
+        if (CONFIG_GEMINI_API_KEY.equals(key)) {
+            return CONFIG_GEMINI_API_KEY;
+        }
+
+        // For other values, try the properties file
+        try {
+            return getConfigBundle().getString(key);
+        } catch (Exception e) {
+            throw new IllegalStateException("Config parameter not found: " + key);
+        }
     }
 }

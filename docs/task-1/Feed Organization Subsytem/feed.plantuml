@@ -1,0 +1,184 @@
+@startuml
+
+' Core Entities
+class Article {
+    - id: String
+    - feedId: String
+    - url: String
+    - title: String
+    - creator: String
+    - publicationDate: Date
+    - createDate: Date
+}
+
+class FeedSubscription {
+    - id: String
+    - userId: String
+    - feedId: String
+    - title: String
+    - unreadCount: Integer
+    - createDate: Date
+}
+
+class Feed {
+    - id: String
+    - rssUrl: String
+    - title: String
+    - language: String
+    - description: String
+    - createDate: Date
+}
+
+class Category {
+    - id: String
+    - userId: String
+    - name: String
+    - order: Integer
+    - folded: Boolean
+    - createDate: Date
+}
+
+class UserArticle {
+    - id: String
+    - userId: String
+    - articleId: String
+    - createDate: Date
+    - readDate: Date
+}
+
+' Relationships between Entities
+FeedSubscription "1" --> "*" Feed
+Feed "1" --> "*" Article
+UserArticle "1" --> "1" Article
+Category "1" --> "*" FeedSubscription
+
+' DTO Classes
+class ArticleDto {
+    - id: String
+    - title: String
+    - creator: String
+    - publicationDate: Date
+    - createDate: Date
+}
+
+class FeedSubscriptionDto {
+    - id: String
+    - feedSubscriptionTitle: String
+    - feedTitle: String
+    - userId: String
+    - unreadUserArticleCount: Integer
+}
+
+class FeedDto {
+    - id: String
+    - rssUrl: String
+}
+
+class UserArticleDto {
+    - id: String
+    - readTimestamp: Long
+    - articleId: String
+    - articleTitle: String
+}
+
+' Resource Classes
+abstract class BaseResource {
+    + authenticate(): boolean
+    + checkBaseFunction(baseFunction: BaseFunction)
+}
+
+class CategoryResource {
+    + list(): Response
+    + add(name: String): Response
+    + delete(id: String): Response
+    + update(id: String, name: String, folded: Boolean): Response
+}
+
+class ArticleResource {
+    + read(id: String): Response
+    + readMultiple(ids: List<String>): Response
+    + unread(id: String): Response
+    + unreadMultiple(ids: List<String>): Response
+}
+
+class SubscriptionResource {
+    + list(): Response
+    + add(url: String, title: String): Response
+    + delete(id: String): Response
+    + read(id: String): Response
+}
+
+class SearchResource {
+    + searchArticles(query: String): Response
+    + searchFeeds(query: String): Response
+}
+
+class AppResource {
+    + version(): Response
+    + log(level: String, message: String): Response
+}
+
+' DAO Classes
+class UserArticleDao {
+    + create(UserArticle ua): String
+    + update(UserArticle ua): UserArticle
+    + markAsRead(): void
+}
+
+class FeedSubscriptionDao {
+    + create(FeedSubscription fs): String
+    + update(FeedSubscription fs): FeedSubscription
+    + delete(String id): void
+    + findByCategory(String categoryId): List<FeedSubscription>
+}
+
+class ArticleDao {
+    + create(Article article): String
+    + update(Article article): Article
+    + delete(String id): void
+    + findAll(): List<Article>
+}
+
+class FeedDao {
+    + create(Feed feed): String
+    + getByRssUrl(String rssUrl): Feed
+    + update(Feed feed): Feed
+}
+
+class CategoryDao {
+    + create(Category category): String
+    + update(Category category): Category
+    + delete(String id): void
+    + findAllCategory(String userId): List<Category>
+}
+
+' Relationships between Resources and DAOs
+CategoryResource --> CategoryDao
+ArticleResource --> ArticleDao
+SubscriptionResource --> FeedSubscriptionDao
+SearchResource --> ArticleDao
+SearchResource --> FeedDao
+
+' Inheritance Relationships
+BaseResource <|-- CategoryResource
+BaseResource <|-- ArticleResource
+BaseResource <|-- SubscriptionResource
+BaseResource <|-- AppResource
+
+' Relationships and Dependencies (Dotted lines)
+CategoryResource ..> FeedSubscriptionDao 
+ArticleResource ..> FeedDao
+SubscriptionResource ..> UserArticleDto 
+ArticleDao ..> FeedDao 
+FeedSubscriptionDao ..> CategoryDao 
+
+' Add more dependencies to reflect interactions
+ArticleResource ..> ArticleDto 
+SubscriptionResource ..> FeedDto 
+CategoryResource ..> FeedSubscriptionDto 
+UserArticleDao ..> ArticleDao
+UserArticleDao ..> FeedSubscriptionDao
+
+@enduml
+
+

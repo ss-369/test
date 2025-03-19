@@ -1,0 +1,40 @@
+<?xml version="1.0"?>
+<!DOCTYPE module PUBLIC "-//Checkstyle//DTD Checkstyle Configuration 1.3//EN" "https://checkstyle.org/dtds/configuration_1_3.dtd">
+<module name="Checker">
+  <module name="TreeWalker">
+    <!-- Cyclomatic Complexity -->
+    <module name="CyclomaticComplexity">
+      <property name="max" value="15"/>
+    </module>
+
+    <!-- Class Fan-Out Complexity (Coupling Between Objects) -->
+    <module name="ClassFanOutComplexity">
+      <property name="max" value="10"/>
+    </module>
+
+    <!-- Method Length -->
+    <module name="MethodLength">
+      <property name="max" value="30"/>
+    </module>
+
+    <!-- Class Data Abstraction Coupling -->
+    <module name="ClassDataAbstractionCoupling">
+      <property name="max" value="5"/>
+    </module>
+
+    <!-- NPath Complexity -->
+    <module name="NPathComplexity">
+      <property name="max" value="200"/>
+    </module>
+
+    <!-- Number of Parameters in Methods -->
+    <module name="ParameterNumber">
+      <property name="max" value="5"/>
+    </module>
+  </module>
+
+  <!-- Code Duplication Detection -->
+  <module name="StrictDuplicateCode">
+    <property name="min" value="10"/> <!-- Minimum number of lines to consider duplication -->
+  </module>
+</module>

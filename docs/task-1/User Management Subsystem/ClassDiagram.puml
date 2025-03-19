@@ -1,0 +1,75 @@
+@startuml
+class User {
+    - id : String
+    - username : String
+    - password : String
+    - email : String
+    - localeId : String
+    - theme : String
+    ...
+    + getId() : String
+    + getUsername() : String
+    ...
+}
+
+class UserDao {
+    + authenticate(username : String, password : String) : String
+    + create(user : User) : String
+    + update(user : User) : User
+    + updatePassword(user : User) : User
+    ...
+}
+
+class UserResource {
+    + register(...) : Response
+    + update(...) : Response
+    + login(...) : Response
+    + logout() : Response
+    + delete(...) : Response
+    + info() : Response
+    ...
+}
+
+class UserCreatedEvent {
+    - user : User
+    + getUser() : User
+    + setUser(user : User)
+}
+
+class PasswordChangedEvent {
+    - user : User
+    + getUser() : User
+    + setUser(user : User)
+}
+
+
+class UserPrincipal {
+    - id : String
+    - name : String
+    ...
+    + getId() : String
+    + getName() : String
+    ...
+}
+
+abstract class SecurityFilter {
+    + {abstract} authenticate(request : HttpServletRequest) : User
+    + doFilter(...)
+    ...
+}
+
+class ValidationUtil {
+    + {static} validateTheme(...) : String
+    + {static} validateLocale(...) : String
+}
+
+UserResource ..> UserDao : uses
+UserResource ..> ValidationUtil : uses
+UserResource -- UserCreatedEvent : creates
+UserResource -- PasswordChangedEvent : creates
+SecurityFilter ..> UserPrincipal : creates
+SecurityFilter ..> User : retrieves
+UserDao .. User : manages
+
+
+@enduml

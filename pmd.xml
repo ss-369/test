@@ -1,0 +1,49 @@
+<?xml version="1.0"?>
+<ruleset name="Custom Metrics Rules"
+         xmlns="http://pmd.sourceforge.net/ruleset/2.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://pmd.sourceforge.net/ruleset/2.0.0 https://pmd.sourceforge.io/ruleset_2_0_0.xsd">
+
+  <description>PMD 7-compatible ruleset for code metrics</description>
+
+  <!-- ========== CODE COMPLEXITY ========== -->
+  <rule ref="category/java/multithreading.xml">
+    <!-- Cyclomatic Complexity -->
+    <rule ref="rule:CyclomaticComplexity">
+      <properties>
+        <property name="reportLevel" value="10" />
+      </properties>
+    </rule>
+
+    <!-- NPath Complexity -->
+    <rule ref="rule:NPathComplexity">
+      <properties>
+        <property name="minimum" value="100" />
+      </properties>
+    </rule>
+  </rule>
+
+  <!-- ========== CODE DESIGN ========== -->
+  <rule ref="category/java/design.xml">
+    <!-- Method Length -->
+    <rule ref="rule:ExcessiveMethodLength">
+      <properties>
+        <property name="minimum" value="30" />
+      </properties>
+    </rule>
+
+    <!-- Class Length -->
+    <rule ref="rule:ExcessiveClassLength">
+      <properties>
+        <property name="minimum" value="500" />
+      </properties>
+    </rule>
+
+    <!-- Coupling Between Objects (CBO) -->
+    <rule ref="rule:CouplingBetweenObjects">
+      <properties>
+        <property name="threshold" value="10" />
+      </properties>
+    </rule>
+  </rule>
+</ruleset>
